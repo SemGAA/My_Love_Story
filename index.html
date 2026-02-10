@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Для моей любимой Мяки</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-pink: #ff85a2;
+            --soft-bg: #fff5f6;
+            --text-color: #5a4a4a;
+            --accent: #ff4d6d;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--soft-bg);
+            color: var(--text-color);
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        /* Уведомления */
+        #feedback {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background: white;
+            padding: 15px 25px;
+            border-radius: 50px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            z-index: 3000;
+            transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        #feedback.show { transform: translateX(-50%) translateY(0); }
+
+        /* Вход */
+        #password-screen {
+            position: fixed;
+            inset: 0;
+            background: white;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: 0.8s ease;
+        }
+
+        input {
+            padding: 15px 25px;
+            border: 2px solid var(--primary-pink);
+            border-radius: 30px;
+            outline: none;
+            font-size: 16px;
+            margin-top: 15px;
+            text-align: center;
+            width: 85%;
+            max-width: 320px;
+        }
+
+        button {
+            background: var(--primary-pink);
+            color: white;
+            border: none;
+            padding: 15px 35px;
+            border-radius: 30px;
+            margin-top: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        /* Контент */
+        #main-content { display: none; opacity: 0; }
+
+        header {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .memory-section { padding: 20px; max-width: 600px; margin: 0 auto; }
+
+        .photo-card {
+            background: white;
+            padding: 15px;
+            border-radius: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            margin-bottom: 60px;
+            opacity: 0;
+            transform: translateY(40px);
+            transition: 0.8s ease-out;
+        }
+        .photo-card.visible { opacity: 1; transform: translateY(0); }
+
+        /* Стили для разных типов медиа */
+        .media-container { width: 100%; border-radius: 18px; overflow: hidden; background: #eee; }
+        
+        .media-container video, .media-container img {
+            width: 100%;
+            display: block;
+            object-fit: cover;
+        }
+
+        .horizontal img { aspect-ratio: 16 / 9; }
+        .vertical img { aspect-ratio: 3 / 4; max-width: 450px; margin: 0 auto; }
+        .standard img { aspect-ratio: 1 / 1; }
+
+        .photo-card h4 { margin-top: 15px; color: var(--accent); font-size: 18px; }
+        .photo-card p { margin-top: 8px; font-size: 14px; line-height: 1.5; color: #666; }
+
+        /* Кошачья дискотека (2 видео в ряд) */
+        .cat-disco {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .cat-disco video { border-radius: 12px; width: 100%; }
+
+        /* Квест */
+        .quest-section { padding: 60px 20px; text-align: center; background: white; border-radius: 40px; margin-top: 50px; }
+        .quest-card { display: none; animation: slideIn 0.5s forwards; }
+        .quest-card.active { display: block; }
+        @keyframes slideIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+
+        #reason-text { font-weight: 600; color: var(--accent); margin: 20px 0; min-height: 50px; }
+        .final-msg { font-size: 22px; color: var(--accent); font-weight: bold; display: none; margin-top: 20px; }
+    </style>
+</head>
+<body>
+
+    <div id="feedback"><span id="feedback-icon"></span> <span id="feedback-text"></span></div>
+
+    <div id="password-screen">
+        <h1 style="color: var(--primary-pink);">С 14 Февраля</h1>
+        <h2 style="color: var(--primary-pink);">Любимая</h2>
+        <br>
+        <p>Введи пароль:</p>
+        <input type="text" id="pass-input" placeholder="То как я тебя называю...">
+        <button onclick="checkPassword()">Войти в наш мир ✨</button>
+    </div>
+
+    <div id="main-content">
+        <header>
+            <div>
+                <h1 style="font-size: 2.5rem;">Наш Альбом</h1>
+                <p>Листай вниз, тут всё про нас</p>
+                <div style="font-size: 30px; margin-top: 20px;">↓</div>
+            </div>
+        </header>
+
+        <section class="memory-section">
+            
+            <div class="photo-card standard">
+                <div class="media-container">
+                    <video src="/img/Video Projectгеншш.mp4" loop muted playsinline autoplay></video>
+                </div>
+                <h4>Ты - моё вдохновение</h4>
+                <p>Я могу смотреть на тебя бесконечно, потому что ты - самая красивая девочка в этой вселенной.</p>
+            </div>
+
+            <div class="photo-card standard">
+                <div class="media-container">
+                    <img src="/img/photo_2025-01-06_07-06-48.jpg" alt="Почти вместе">
+                </div>
+                <h4>Наш уют</h4>
+                <p>Фото из нашей почти совместной жизни. Было круто делить с тобой быт, это только начало!</p>
+            </div>
+
+            <div class="photo-card horizontal">
+                <div class="media-container">
+                    <img src="/img/photo_2025-02-05_20-41-23.jpg" alt="Поцелуи">
+                </div>
+                <h4>Сладкий день</h4>
+                <p>Поцелуи и помада повсюду... Очень милый день, который хочется повторять снова и снова.</p>
+            </div>
+
+            <div class="photo-card horizontal">
+                <div class="media-container">
+                    <img src="/img/photo_2025-02-20_23-26-59.jpg" alt="Майнкрафт">
+                </div>
+                <h4>Наш крафт</h4>
+                <p>Жаль, что так мало играем в Майнкрафт, но я уверен - все наши главные постройки еще впереди!</p>
+            </div>
+
+            <div class="photo-card vertical">
+                <div class="media-container">
+                    <img src="/img/photo_2026-02-10_18-59-41.jpg" alt="Крыша">
+                </div>
+                <h4>Выше только звезды</h4>
+                <p>Мы были там совсем одни... Свежий воздух, высота и моя самая любимая девочка рядом.</p>
+            </div>
+
+            <div class="photo-card standard">
+                <div class="media-container">
+                    <img src="/img/photo_2026-02-10_19-04-41.jpg" alt="Милашка">
+                </div>
+                <h4>Просто люблю</h4>
+                <p>Мне так нравится эта фоточка, ты здесь такая милая. Не могу перестать улыбаться, глядя на неё.</p>
+            </div>
+
+            <div class="photo-card">
+                <div class="cat-disco">
+                    <video class="auto-video" src="/img/video_2026-02-10_19-08-00.mp4" loop muted playsinline></video>
+                    <video class="auto-video" src="/img/video_2026-02-10_19-06-59.mp4" loop muted playsinline></video>
+                </div>
+                <h4>Танцы от Алиски и Юки</h4>
+                <p>Даже котики празднуют! Они тоже знают, как сильно я тебя люблю.</p>
+            </div>
+
+        </section>
+
+        <div style="padding: 20px;">
+            <div class="generator-box" style="text-align: center; background: #fff; padding: 30px; border-radius: 30px;">
+                <h3>За что я тебя люблю?</h3>
+                <p id="reason-text">Нажми на кнопку...</p>
+                <button onclick="generateLove()">💖</button>
+            </div>
+
+            <section class="quest-section">
+                <h2>Квест на подарок</h2>
+                <div id="q1" class="quest-card active">
+                    <p>С чего всё началось?</p>
+                    <input type="text" id="ans1" placeholder="Ответ...">
+                    <button onclick="nextQuest(1, 'негры', 'дайвинчик', 'переписка')">Дальше</button>
+                </div>
+                <div id="q2" class="quest-card">
+                    <p>Где мы были совсем одни на высоте?</p>
+                    <input type="text" id="ans2" placeholder="Место...">
+                    <button onclick="nextQuest(2, 'крыша')">Дальше!</button>
+                </div>
+                <div id="q3" class="quest-card">
+                    <p>Какого цвета была твоя одежда на той самой «милой фоточке»?</p>
+                    <input type="text" id="ans3" placeholder="Цвет...">
+                    <button onclick="nextQuest(3, 'белая', 'серая')">Дальше!</button>
+                </div>
+                <div id="q4" class="quest-card">
+                    <p>Какого цвета была моя футболка, когда мы встретились вживую в самый первый раз?</p>
+                    <input type="text" id="ans4" placeholder="Цвет...">
+                    <button onclick="nextQuest(4, 'фиолетовая', 'аниме')">Дальше!</button>
+                </div>
+                <div id="q5" class="quest-card">
+                    <p>Кто из нас первый признался в любви: я, ты или мы сделали это одновременно?</p>
+                    <input type="text" id="ans5" placeholder="Кто?...(Может Сёма?)">
+                    <button onclick="nextQuest(5, 'ксюша', 'я', 'мяка', 'ксю')">Дальше!</button>
+                </div>
+                <div id="final-quest" class="quest-card">
+                    <p>Готова получить сюрприз?</p>
+                    <button onclick="finishQuest()">ДА! 😍</button>
+                </div>
+                <div id="gift-text" class="final-msg">
+                    <br>
+                    Подарок у меня!
+                    <br>
+                    Бери скорей.
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script>
+        function vibro(ms) { if (navigator.vibrate) navigator.vibrate(ms); }
+
+        function showFeedback(msg, isError = false) {
+            const fb = document.getElementById('feedback');
+            document.getElementById('feedback-text').innerText = msg;
+            document.getElementById('feedback-icon').innerText = isError ? '🥺' : '💖';
+            fb.classList.add('show');
+            setTimeout(() => fb.classList.remove('show'), 2000);
+        }
+
+        function checkPassword() {
+            if (document.getElementById('pass-input').value.toLowerCase().trim() === 'мяка') {
+                vibro(100);
+                document.getElementById('password-screen').style.transform = 'translateY(-100%)';
+                document.getElementById('main-content').style.display = 'block';
+                setTimeout(() => document.getElementById('main-content').style.opacity = '1', 100);
+            } else {
+                vibro([50, 50]);
+                showFeedback('Неправильно, попробуй еще раз!', true);
+            }
+        }
+
+        // Автозапуск видео при скролле
+        const videoObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.play();
+                } else {
+                    entry.target.pause();
+                }
+            });
+        }, { threshold: 0.5 });
+
+        document.querySelectorAll('.auto-video').forEach(v => videoObserver.observe(v));
+
+        // Появление карточек
+        const cardObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) entry.target.classList.add('visible');
+            });
+        }, { threshold: 0.1 });
+        document.querySelectorAll('.photo-card').forEach(c => cardObserver.observe(c));
+
+        const reasons = [
+    "Твоя улыбка", 
+    "Твоя забота", 
+    "Ты — мой лучший друг", 
+    "Твой смех", 
+    "То, как ты смотришь на меня", 
+    "Твоего дракона", 
+    "Твои ножки", 
+    "Непростой характер", 
+    "Зелёные глазки", 
+    "Вкусные губки", 
+    "Отличные шутки", 
+    "Чудесный голос", 
+    "Прекрасный интим",
+    "Твои уютные объятия",
+    "То, как ты мило сопишь рядом",
+    "Поддержку во всём",
+    "Твои мягкие щечки",
+    "То, как ты заставляешь меня сиять",
+    "Наши бесконечные разговоры",
+    "Твою искренность и честность",
+    "Запах твоих волос",
+    "За то, что ты — это просто ты"
+];        function generateLove() {
+            vibro(40);
+            document.getElementById('reason-text').innerText = reasons[Math.floor(Math.random() * reasons.length)];
+        }
+
+function nextQuest(id, ...correctAnswers) {
+    let userAns = document.getElementById('ans' + id).value.toLowerCase().trim();
+    
+    if (correctAnswers.some(ans => ans.toLowerCase().trim() === userAns)) {
+        vibro(100);
+        showFeedback('Правильно!');
+        
+        document.getElementById('q' + id).style.display = 'none';
+        
+        const next = document.getElementById('q' + (id + 1)) || document.getElementById('final-quest');
+        if (next) {
+            next.style.display = 'block';
+            next.classList.add('active');
+        }
+    } else {
+        vibro([50, 50]);
+        showFeedback('Попробуй другое слово...', true);
+    }
+}
+
+        function finishQuest() {
+            vibro([200, 100, 200]);
+            document.getElementById('final-quest').style.display = 'none';
+            document.getElementById('gift-text').style.display = 'block';
+            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#ff85a2', '#ff4d6d'] });
+        }
+    </script>
+</body>
+</html>
